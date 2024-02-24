@@ -1,4 +1,5 @@
 using LinearAlgebra, SparseArrays, TestImages, Images, Plots
+using RLinearAlgebra
 
 function kaczmarz(A, b, k)
     m, n = size(A)  # Get the size of A
@@ -126,12 +127,27 @@ x_s = kaczmarz(A, b, k)
 # reshape the result to an image
 xs_image = reshape(x_s, N, N)
 
+# RLinearAlgebra
+# build solver
+solver = RLSSolver(
+    LinSysVecRowRandCyclic(),   # Random Cyclic Sampling
+    LinSysVecRowProjStd(),      # Hyperplane projection
+    LSLogFull(),                # Full Logger: maintains residual history
+    LSStopMaxIterations(k),     # Maximum iterations stopping criterion
+    nothing                     # System solution (not solved yet)
+)
+
+x_r = rsolve(solver, A, b)
+xr_image = reshape(x_r, N, N)
+
+
 # Create subplots for "before" and "after" images
-p1 = heatmap(x, color=:grays, aspect_ratio=1, title="Original")
-p2 = heatmap(xs_image, color=:grays, aspect_ratio=1, title="Kaczmarz")
+p1 = heatmap(x, color=:grays, colorbar=false, aspect_ratio=1, title="Original")
+p2 = heatmap(xs_image, color=:grays, colorbar=false, aspect_ratio=1, title="Kaczmarz. \nIterations: $k")
+p3 = heatmap(xr_image, color=:grays, colorbar=false, aspect_ratio=1, title="RLinearAlgebra. \nIterations: $k")
 
 # Combine the plots into one figure
-p = plot(p1, p2, layout=(1, 2), size=(800, 400))
+p = plot(p1, p2, p3, layout=(1, 3), size=(900, 400))
 
 # Display the figure
 display(p)
