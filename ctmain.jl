@@ -1,6 +1,6 @@
 # Adaptation of
 # https://github.com/hanyoseob/matlab-ART
-using RadonKA, Images, ImageTransformations, Random, TestImages, ImageIO, ImageView
+using RadonKA, Images, ImageTransformations, Random, TestImages, ImageIO, ImageView, Distributions
 
 function ART(A, AT, b, x, lambda, niter, bpos)
     ATA = AT(A(ones(Float32, size(x, 1), size(x, 2))))
